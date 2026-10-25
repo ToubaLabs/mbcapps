@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useI18n } from "@/i18n/context";
 
 const KEY = "mbc-consent";
 
@@ -10,6 +11,7 @@ const KEY = "mbc-consent";
  * jamais envoyé à un serveur. Brancher l'outil d'audience seulement si consent === "oui".
  */
 export default function CookieBanner() {
+  const { t } = useI18n();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -28,14 +30,12 @@ export default function CookieBanner() {
 
   if (!show) return null;
   return (
-    <div className="cookie" role="dialog" aria-label="Votre vie privée">
-      <div className="display-s">Votre vie privée</div>
-      <p className="body-s muted">
-        Nous mesurons l'audience du site de façon anonyme pour l'améliorer. Aucune donnée personnelle n'est collectée ni enregistrée.
-      </p>
+    <div className="cookie" role="dialog" aria-label={t.cookie.ariaLabel}>
+      <div className="display-s">{t.cookie.title}</div>
+      <p className="body-s muted">{t.cookie.text}</p>
       <div className="cookie__actions">
-        <button className="btn btn--primary btn--sm" onClick={() => choose("oui")}>Accepter</button>
-        <button className="btn btn--secondary btn--sm" onClick={() => choose("non")}>Refuser</button>
+        <button className="btn btn--primary btn--sm" onClick={() => choose("oui")}>{t.cookie.accept}</button>
+        <button className="btn btn--secondary btn--sm" onClick={() => choose("non")}>{t.cookie.refuse}</button>
       </div>
     </div>
   );

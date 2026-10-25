@@ -1,5 +1,13 @@
 // Contenus éditoriaux : FAQ, témoignages, articles du Journal.
 
+/** Clips du carrousel vidéo du hero (fond défilant), tous dans public/images/videos/. */
+export const homeVideos = [
+  { src: "/images/videos/hero.mp4", caption: "Prise en charge à la villa" },
+  { src: "/images/videos/video-1.mp4", caption: "Confort à bord" },
+  { src: "/images/videos/video-2.mp4", caption: "Un véhicule d'exception" },
+  { src: "/images/videos/video-3.mp4", caption: "Arrivée à Monte-Carlo" },
+];
+
 export const faq = {
   Réservation: [
     {
@@ -18,13 +26,13 @@ export const faq = {
   "Prix et paiement": [
     {
       q: "Les péages et l'attente sont-ils compris ?",
-      a: "Oui. Les péages et 60 minutes d'attente à l'aéroport sont inclus dans tous nos prix fixes.",
+      a: "Les péages sont inclus dans tous nos prix fixes. 15 minutes d'attente sont offertes ; au-delà, une heure d'attente est facturée au tarif horaire du véhicule.",
     },
     {
       q: "Comment se passe le paiement ?",
       a: "Au chauffeur, ou par un lien de paiement sécurisé envoyé par votre conseiller dans la conversation.",
     },
-    { q: "Y a-t-il un supplément de nuit ?", a: "Oui, +20 % entre 22 h et 6 h." },
+    { q: "Y a-t-il un supplément de nuit ?", a: "Non, nous ne pratiquons pas de tarif de nuit." },
   ],
   "Aéroport et vols": [
     {
@@ -41,6 +49,8 @@ export const faq = {
   ],
 };
 
+// ⚠️ Section « Avis clients » de l'accueil désactivée temporairement (commentée dans src/app/page.tsx).
+// Les données restent ici, prêtes à être réaffichées sur la fiche véhicule et ailleurs.
 export const testimonials = [
   {
     quote: "« Arrivé avec deux heures de retard, mon chauffeur était là, pancarte à la main. »",
@@ -65,6 +75,13 @@ export type Article = {
   title: string;
   excerpt: string;
   readTime: string;
+  image?: {
+    alt: string;
+    author: string;
+    source: string;
+    license: string;
+    licenseUrl: string;
+  };
   body: { type: "p" | "h" | "quote"; text: string }[];
 };
 
@@ -76,6 +93,13 @@ export const articles: Article[] = [
     excerpt:
       "Routes fermées, horaires, points de dépose autorisés : notre guide pour arriver à l'heure sans stress.",
     readTime: "6 min",
+    image: {
+      alt: "Épingle du Fairmont sur le circuit du Grand Prix de Monaco",
+      author: "Alexander Migl",
+      source: "https://commons.wikimedia.org/wiki/File:Fairmont_Hairpin_Monaco_IMG_1012.jpg",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+    },
     body: [
       {
         type: "p",
@@ -108,6 +132,13 @@ export const articles: Article[] = [
     title: "De l'aéroport de Nice à Monaco : toutes les options comparées",
     excerpt: "Bus, train, hélicoptère ou chauffeur : durée, prix et confort de chaque solution.",
     readTime: "5 min",
+    image: {
+      alt: "Vue aérienne de l'aéroport Nice Côte d'Azur et du littoral",
+      author: "Olivier Cleynen",
+      source: "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Nice-C%C3%B4te_d%E2%80%99Azur_Airport.jpg",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+    },
     body: [
       {
         type: "p",
@@ -126,6 +157,13 @@ export const articles: Article[] = [
     title: "Nos adresses préférées de Monte-Carlo pour un dîner",
     excerpt: "Tables étoilées, terrasses avec vue et adresses plus discrètes : la sélection de nos chauffeurs.",
     readTime: "4 min",
+    image: {
+      alt: "Façade du Casino de Monte-Carlo à Monaco",
+      author: "Miguel Mendez",
+      source: "https://commons.wikimedia.org/wiki/File:Monte_Carlo_Casino_(46940444965).jpg",
+      license: "CC BY 2.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/2.0/",
+    },
     body: [
       {
         type: "p",
@@ -139,6 +177,13 @@ export const articles: Article[] = [
     title: "Une journée à Èze et Saint-Jean-Cap-Ferrat avec chauffeur",
     excerpt: "Village perché, jardin exotique et villas de la Riviera, sans chercher où se garer.",
     readTime: "5 min",
+    image: {
+      alt: "Le village perché d'Èze dominant la Méditerranée",
+      author: "Gilbert Bochenek",
+      source: "https://commons.wikimedia.org/wiki/File:Eze-Village-PACA-France.jpg",
+      license: "CC BY-SA 3.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/",
+    },
     body: [{ type: "p", text: "Un itinéraire d'une demi-journée, idéal en mise à disposition." }],
   },
   {
@@ -147,6 +192,13 @@ export const articles: Article[] = [
     title: "Monaco Yacht Show : organiser les navettes de vos invités",
     excerpt: "Port Hercule, hôtels, aéroport : comment coordonner plusieurs véhicules sans stress.",
     readTime: "4 min",
+    image: {
+      alt: "Superyachts amarrés au Port Hercule pendant le Monaco Yacht Show",
+      author: "102Legobrick",
+      source: "https://commons.wikimedia.org/wiki/File:MYS_2022_2.jpg",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+    },
     body: [{ type: "p", text: "Pendant le salon, les abords du port sont très fréquentés. Voici comment s'organiser." }],
   },
   {
@@ -155,16 +207,30 @@ export const articles: Article[] = [
     title: "Héliport de Monaco : comment ça marche ?",
     excerpt: "7 minutes depuis Nice : horaires, bagages et transfert jusqu'à votre hôtel.",
     readTime: "3 min",
+    image: {
+      alt: "Hélicoptères Heli Air Monaco sur le tarmac de l'héliport de Monaco",
+      author: "Arnaud 25",
+      source: "https://commons.wikimedia.org/wiki/File:Heliport_Monaco_3.jpg",
+      license: "CC BY-SA 3.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/",
+    },
     body: [{ type: "p", text: "L'héliport de Fontvieille relie Nice à Monaco en quelques minutes." }],
   },
+];
+
+export const serviceImages: { src: string; credit?: Article["image"] }[] = [
+  { src: "/images/journal/aeroport-nice-monaco-options.jpg", credit: articles[1].image },
+  { src: "/images/journal/grand-prix-monaco-circuler.jpg", credit: articles[0].image },
+  { src: "/images/vehicules/mercedes-classe-s-berline-1.jpg" },
 ];
 
 /**
  * Articles publiés par d'autres sites : on affiche une carte qui renvoie vers l'article d'origine
  * (nouvel onglet). Le résumé est écrit par nous, jamais copié depuis l'article.
  * featured = affiché dans la bande « Ils parlent de nous » de l'accueil.
+ * logo = fichier dans /public/images/presse/ (logo officiel du média). Si absent, le nom en texte s'affiche à la place.
  */
-export const pressArticles: { media: string; title: string; date: string; summary: string; url: string; featured?: boolean }[] = [
+export const pressArticles: { media: string; title: string; date: string; summary: string; url: string; featured?: boolean; logo?: string }[] = [
   {
     media: "Forbes Afrique",
     title: "Mbaye Mangara : la réussite d'un entrepreneur sénégalais à Monaco",
@@ -172,6 +238,7 @@ export const pressArticles: { media: string; title: string; date: string; summar
     summary: "Le parcours du fondateur de Monaco Black Car, de sa première voiture en 2012 à une flotte de douze véhicules.",
     url: "https://forbesafrique.com/mbaye-mangara-la-reussite-dun-entrepreneur-senegalais-a-monaco/",
     featured: true,
+    logo: "/images/presse/forbes-afrique.png",
   },
   {
     media: "BFM TV",
@@ -180,13 +247,36 @@ export const pressArticles: { media: string; title: string; date: string; summar
     summary: "Monaco Black Cars présenté dans la rubrique « Entreprises d'avenir ».",
     url: "https://www.bfmtv.com/pratique/entreprises-d-avenir/monaco-black-cars-le-specialiste-du-transport-haut-de-gamme-avec-chauffeurs_AB-202502240019.html",
     featured: true,
+    logo: "/images/presse/bfm-tv.svg",
   },
   {
-    // ⚠️ À CONFIRMER : média, titre et date du lien transmis par le client
-    media: "Média à confirmer",
-    title: "Titre de l'article à confirmer",
+    media: "Virtually.mc",
+    title: "Service de transfert de luxe – Monaco Black Car – Monaco",
     date: "",
-    summary: "Article à compléter : lien transmis par le client.",
-    url: "https://share.google/TDTkADIAcII0FouVg",
+    summary: "Monaco Black Car présenté dans l'annuaire des adresses de prestige de Monaco : flotte variée (Mercedes Classe S, Maybach Classe S, Tesla Model Y, Classe V…), disponibilité 24h/24 7j/7 et mise à disposition.",
+    url: "https://www.virtually.mc/fr/luxury-transfer-service-monaco-black-car-monaco/",
+    featured: true,
+    logo: "/images/presse/virtually-mc.svg",
   },
+];
+
+/**
+ * Partenaires affichés sur l'accueil (bande « Nos partenaires »).
+ * logo = fichier dans /public/images/partenaires/. Si absent, le nom en texte s'affiche à la place.
+ */
+export const partners: { name: string; tagline?: string; logo?: string; lightLogoBackground?: boolean }[] = [
+  {
+    name: "FindIt",
+    tagline: "Monaco's Solutions",
+    logo: "/images/partenaires/findit.jpg",
+  },
+  {
+    name: "Fairmont Monte-Carlo",
+    // Public domain: https://commons.wikimedia.org/wiki/File:Fairmont_Logo_2016.png
+    logo: "/images/partenaires/fairmont.png",
+    lightLogoBackground: true,
+  },
+  { name: "Métropole Monte-Carlo", logo: "/images/partenaires/metropole.svg", lightLogoBackground: true },
+  { name: "Hôtel Miramar", logo: "/images/partenaires/miramar.svg" },
+  { name: "Groupe Pastor", logo: "/images/partenaires/groupe-pastor.png", lightLogoBackground: true },
 ];

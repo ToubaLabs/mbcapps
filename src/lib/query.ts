@@ -16,3 +16,19 @@ export function todayIso() {
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
   return d.toISOString().slice(0, 10);
 }
+
+/** Terminaux proposés quand l'adresse saisie correspond à l'aéroport de Nice Côte d'Azur. */
+export const niceAirportTerminals = ["Terminal 1", "Terminal 2", "Terminal Affaires"];
+
+const NICE_AIRPORT_RE = /a[eé]roport.*nice|nice.*a[eé]roport|nice c[oô]te d'azur/i;
+
+/** Détecte si une adresse saisie correspond à l'aéroport de Nice, pour proposer un terminal. */
+export function isNiceAirport(value: string) {
+  return NICE_AIRPORT_RE.test(value);
+}
+
+/** Ajoute (ou remplace) la mention du terminal à la fin d'une adresse d'aéroport. */
+export function withNiceTerminal(value: string, terminal: string) {
+  const base = value.replace(/,?\s*Terminal\s+(1|2|Affaires)\s*$/i, "").trim();
+  return `${base}, ${terminal}`;
+}

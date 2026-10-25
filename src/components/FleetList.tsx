@@ -3,9 +3,11 @@
 import { useMemo, useState } from "react";
 import { vehicles, type Vehicle } from "@/data/vehicles";
 import { whatsappLink } from "@/lib/whatsapp";
+import { useI18n } from "@/i18n/context";
 import { VehicleTile } from "./Vehicle";
 
 const CATEGORIES: Vehicle["category"][] = ["Berlines", "Vans", "SUV", "Électriques"];
+// Libellés canoniques (toujours en français : réutilisés tels quels dans le message WhatsApp).
 const GROUPS = [
   { label: "1 à 3", min: 1 },
   { label: "4", min: 4 },
@@ -14,9 +16,10 @@ const GROUPS = [
 
 /** Page Flotte : filtres, tri et état vide « Aucun véhicule ne correspond ». */
 export default function FleetList() {
+  const { t } = useI18n();
   const [cats, setCats] = useState<string[]>([]);
   const [group, setGroup] = useState<number | null>(null);
-  const [sort, setSort] = useState<"asc" | "desc">("asc");
+  const [sort, setSort] = useState<"asc" | "desc">("desc");
   const [open, setOpen] = useState(false);
 
   const list = useMemo(() => {
@@ -31,24 +34,24 @@ export default function FleetList() {
     <section className="section" style={{ paddingTop: 48 }}>
       <div className="container fleet-layout">
         <button className="btn btn--secondary fleet-filters-toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-          Filtres{cats.length + (group !== null ? 1 : 0) ? ` (${cats.length + (group !== null ? 1 : 0)})` : ""}
+          {t.fleet.filtersBtn}{cats.length + (group !== null ? 1 : 0) ? ` (${cats.length + (group !== null ? 1 : 0)})` : ""}
         </button>
         <aside className="card filters" data-open={open}>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span className="display-s">Filtres</span>
-            <button className="link" style={{ background: "none", border: 0, cursor: "pointer" }} onClick={clear}>Effacer</button>
+            <span className="display-s">{t.fleet.filtersHeading}</span>
+            <button className="link" style={{ background: "none", border: 0, cursor: "pointer" }} onClick={clear}>{t.fleet.clear}</button>
           </div>
           <fieldset>
-            <legend>Catégorie</legend>
+            <legend>{t.fleet.categoryLegend}</legend>
             {CATEGORIES.map((c) => (
-              <label key={c} className="check"><input type="checkbox" checked={cats.includes(c)} onChange={() => toggle(c)} />{c}</label>
+              <label key={c} className="check"><input type="checkbox" checked={cats.includes(c)} onChange={() => toggle(c)} />{t.fleet.categories[c]}</label>
             ))}
           </fieldset>
           <fieldset>
-            <legend>Passagers</legend>
+            <legend>{t.fleet.passengersLegend}</legend>
             <div className="chips">
               {GROUPS.map((g, i) => (
-                <button key={g.label} type="button" className="chip" aria-pressed={group === i} onClick={() => setGroup(group === i ? null : i)}>{g.label}</button>
+                <button key={g.label} type="button" className="chip" aria-pressed={group === i} onClick={() => setGroup(group === i ? null : i)}>{t.fleet.groups[i]}</button>
               ))}
             </div>
           </fieldset>
@@ -57,13 +60,13 @@ export default function FleetList() {
         <div className="stack" style={{ gap: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
             <span className="muted" aria-live="polite">
-              {list.length ? `${list.length} véhicule${list.length > 1 ? "s" : ""}, prix pour Nice aéroport → Monaco` : "0 véhicule pour ces filtres"}
+              {list.length ? `${list.length} ${t.fleet.resultsCountSuffix}` : t.fleet.noResultsForFilters}
             </span>
             <label className="field" style={{ padding: "8px 14px", minWidth: 220 }}>
-              <span className="field-label">Trier</span>
+              <span className="field-label">{t.fleet.sortLabel}</span>
               <select value={sort} onChange={(e) => setSort(e.target.value as "asc" | "desc")}>
-                <option value="asc">Prix croissant</option>
-                <option value="desc">Prix décroissant</option>
+                <option value="asc">{t.fleet.sortAsc}</option>
+                <option value="desc">{t.fleet.sortDesc}</option>
               </select>
             </label>
           </div>
@@ -72,13 +75,13 @@ export default function FleetList() {
             <div className="grid grid-2">{list.map((v) => <VehicleTile key={v.slug} v={v} />)}</div>
           ) : (
             <div className="empty">
-              <h2 className="display-s">Aucun véhicule ne correspond</h2>
-              <p className="muted">Aucun véhicule de notre flotte ne correspond à ces filtres. Retirez un filtre, ou demandez-nous : nous trouvons souvent une solution.</p>
+              <h2 className="display-s">{t.fleet.emptyTitle}</h2>
+              <p className="muted">{t.fleet.emptyText}</p>
               <div className="empty__actions">
-                <button className="btn btn--primary" onClick={clear}>Effacer les filtres</button>
+                <button className="btn btn--primary" onClick={clear}>{t.fleet.clearFilters}</button>
                 <a className="btn btn--whatsapp" target="_blank" rel="noopener noreferrer"
                   href={whatsappLink(`Bonjour, je cherche un véhicule : ${cats.join(", ") || "toutes catégories"}${group !== null ? `, ${GROUPS[group].label} passagers` : ""}. Avez-vous une solution ?`)}>
-                  Demander sur WhatsApp
+                  {t.fleet.askWhatsapp}
                 </a>
               </div>
             </div>

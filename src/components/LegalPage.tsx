@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/i18n/LocalizedLink";
 
 const DOCS = [
   { href: "/mentions-legales/", label: "Mentions légales" },

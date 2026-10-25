@@ -4,60 +4,92 @@ import { useState } from "react";
 import { eventMessage, whatsappLink, type EventRequest } from "@/lib/whatsapp";
 import { todayIso } from "@/lib/query";
 import { site } from "@/data/site";
+import { vehicles } from "@/data/vehicles";
+import { useI18n } from "@/i18n/context";
 import { Counter, Field } from "./ui";
 import { WhatsAppIcon } from "./WhatsAppButton";
 
-const TYPES = ["Grand Prix", "Yacht Show", "Gala ou soirée", "Mariage", "Autre"];
+// Valeurs canoniques (toujours en français : utilisées dans le message WhatsApp final).
+const TYPES = ["Grand Prix", "Yacht Show", "Gala ou soirée", "Mariage", "Autre"] as const;
 
 /** Demande de devis événement : rien n'est envoyé au site, la demande part sur WhatsApp. */
 export default function EventForm() {
-  const [e, setE] = useState<EventRequest>({ type: "Grand Prix", date: "", hours: "", place: "", guests: 8, sedans: 2, vans: 1, notes: "" });
+  const { t } = useI18n();
+  const [e, setE] = useState<EventRequest>({
+    type: "Grand Prix", date: "", hours: "", place: "", guests: 8, sedans: 2, vans: 1,
+    vehicle: "", passengers: 1, bags: 1, notes: "",
+  });
   const [errors, setErrors] = useState<{ date?: string; place?: string }>({});
   const set = (p: Partial<EventRequest>) => { setE((x) => ({ ...x, ...p })); setErrors({}); };
+
+  const typeLabel = (v: string) => {
+    switch (v) {
+      case "Grand Prix": return t.devis.types.grandPrix;
+      case "Yacht Show": return t.devis.types.yachtShow;
+      case "Gala ou soirée": return t.devis.types.gala;
+      case "Mariage": return t.devis.types.wedding;
+      default: return t.devis.types.other;
+    }
+  };
 
   const send = (ev: React.FormEvent) => {
     ev.preventDefault();
     const err: typeof errors = {};
-    if (!e.date) err.date = "Choisissez la date de l'événement";
-    if (!e.place.trim()) err.place = "Indiquez le lieu de l'événement";
+    if (!e.date) err.date = t.devis.dateError;
+    if (!e.place.trim()) err.place = t.devis.placeError;
     setErrors(err);
     if (Object.keys(err).length) return;
-    window.open(whatsappLink(eventMessage(e)), "_blank", "noopener,noreferrer");
+    // Un vrai clic sur un <a> (plutôt que window.open) : sur iOS Safari, window.open()
+    // appelé après preventDefault()/setState n'est plus traité comme un clic natif direct,
+    // ce qui fait échouer la redirection vers l'appli WhatsApp et laisse un onglet about:blank.
+    const a = document.createElement("a");
+    a.href = whatsappLink(eventMessage(e));
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.click();
   };
 
   return (
     <div className="booking" style={{ paddingTop: 0 }}>
       <form className="booking__main" onSubmit={send} noValidate>
-        <h2 className="display-l">Demande de devis</h2>
-        <p className="muted" style={{ margin: 0 }}>Réponse sous 2 heures, sans engagement. Votre demande est envoyée sur WhatsApp : aucune donnée n'est enregistrée sur notre site.</p>
-        <span className="label muted">Type d'événement *</span>
+        <h2 className="display-l">{t.devis.title}</h2>
+        <p className="muted" style={{ margin: 0 }}>{t.devis.subtitle}</p>
+        <span className="label muted">{t.devis.eventTypeLabel}</span>
         <div className="chips">
-          {TYPES.map((t) => <button key={t} type="button" className="chip" aria-pressed={e.type === t} onClick={() => set({ type: t })}>{t}</button>)}
+          {TYPES.map((v) => <button key={v} type="button" className="chip" aria-pressed={e.type === v} onClick={() => set({ type: v })}>{typeLabel(v)}</button>)}
         </div>
         <div className="grid grid-2">
-          <Field label="Date *" error={errors.date}><input type="date" min={todayIso()} value={e.date} onChange={(x) => set({ date: x.target.value })} /></Field>
-          <Field label="Horaires"><input value={e.hours} onChange={(x) => set({ hours: x.target.value })} placeholder="Ex. 18:00 à 02:00" /></Field>
+          <Field label={t.devis.dateLabel} error={errors.date}><input type="date" min={todayIso()} value={e.date} onChange={(x) => set({ date: x.target.value })} /></Field>
+          <Field label={t.devis.hoursLabel}><input value={e.hours} onChange={(x) => set({ hours: x.target.value })} placeholder={t.devis.hoursPlaceholder} /></Field>
         </div>
-        <Field label="Lieu principal *" error={errors.place}><input value={e.place} onChange={(x) => set({ place: x.target.value })} placeholder="Hôtel, restaurant, adresse…" /></Field>
-        <span className="label muted">Invités et véhicules</span>
+        <Field label={t.devis.placeLabel} error={errors.place}><input value={e.place} onChange={(x) => set({ place: x.target.value })} placeholder={t.devis.placePlaceholder} /></Field>
+        <span className="label muted">{t.devis.guestsVehiclesLabel}</span>
         <div className="grid grid-3">
-          <Counter label="Invités" value={e.guests} max={60} onChange={(v) => set({ guests: v })} />
-          <Counter label="Berlines" value={e.sedans} max={12} onChange={(v) => set({ sedans: v })} />
-          <Counter label="Vans" value={e.vans} max={12} onChange={(v) => set({ vans: v })} />
+          <Counter label={t.devis.guests} value={e.guests} max={60} onChange={(v) => set({ guests: v })} />
+          <Counter label={t.devis.sedans} value={e.sedans} max={12} onChange={(v) => set({ sedans: v })} />
+          <Counter label={t.devis.vans} value={e.vans} max={12} onChange={(v) => set({ vans: v })} />
         </div>
-        <Field label="Précisions (facultatif)"><textarea value={e.notes} onChange={(x) => set({ notes: x.target.value })} placeholder="Ex. accueil des invités à l'héliport à 17:00" /></Field>
-        <div><button type="submit" className="btn btn--whatsapp"><WhatsAppIcon size={18} /> Continuer sur WhatsApp</button></div>
+        <span className="label muted">{t.devis.vehicleWanted}</span>
+        <Field label={t.step2.vehicle}>
+          <select value={e.vehicle} onChange={(x) => set({ vehicle: x.target.value })}>
+            <option value="">{t.devis.noPreference}</option>
+            {vehicles.map((v) => <option key={v.slug} value={v.name}>{v.name}</option>)}
+          </select>
+        </Field>
+        <div className="grid grid-2">
+          <Counter label={t.devis.passengers} value={e.passengers} min={1} max={7} onChange={(v) => set({ passengers: v })} />
+          <Counter label={t.devis.bags} value={e.bags} max={7} onChange={(v) => set({ bags: v })} />
+        </div>
+        <Field label={t.devis.notes}><textarea value={e.notes} onChange={(x) => set({ notes: x.target.value })} placeholder={t.devis.notesPlaceholder} /></Field>
+        <div><button type="submit" className="btn btn--whatsapp"><WhatsAppIcon size={18} /> {t.devis.submit}</button></div>
       </form>
       <aside className="card card--pad recap" style={{ background: "var(--sea)" }}>
-        <h3 className="display-s">Toujours inclus</h3>
+        <h3 className="display-s">{t.devis.alwaysIncludedTitle}</h3>
         <ul className="dot-list body-s">
-          <li>Un chauffeur dédié par véhicule</li>
-          <li>Attente illimitée pendant l'événement</li>
-          <li>Un seul interlocuteur pour tout coordonner</li>
-          <li>Eau et chargeurs à bord</li>
+          {t.devis.included.map((i) => <li key={i}>{i}</li>)}
         </ul>
         <hr className="divider" />
-        <span className="label">Besoin d'une réponse immédiate ?</span>
+        <span className="label">{t.devis.immediateResponse}</span>
         <a href={site.phoneHref} className="display-s gold">{site.phoneDisplay}</a>
       </aside>
     </div>

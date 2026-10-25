@@ -19,6 +19,7 @@ export function useBooking(): [Booking, (b: Partial<Booking>, path: string) => v
     bags: Number(params.get("bags") ?? 2),
     vehicle: params.get("vehicle") ?? undefined,
     price: params.get("price") ? Number(params.get("price")) : undefined,
+    extraVehicle: params.get("extraVehicle") === "true" || undefined,
   };
   const go = (b: Partial<Booking>, path: string) => {
     const next = { ...booking, ...b };
@@ -31,6 +32,7 @@ export function useBooking(): [Booking, (b: Partial<Booking>, path: string) => v
     q.set("bags", String(next.bags));
     if (next.vehicle) q.set("vehicle", next.vehicle);
     if (next.price) q.set("price", String(next.price));
+    if (next.extraVehicle) q.set("extraVehicle", "true");
     router.push(`${path}?${q.toString()}`);
   };
   return [booking, go];

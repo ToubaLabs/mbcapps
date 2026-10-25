@@ -1,7 +1,28 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/i18n/LocalizedLink";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useI18n } from "@/i18n/context";
+import type { Article } from "@/data/content";
+import { localizeArticle } from "@/data/articles-i18n";
+
+/** Popup générique (même gabarit visuel que le sélecteur date/heure), monté via portail. */
+export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [onClose]);
+  return createPortal(
+    <div className="picker-backdrop" onClick={onClose}>
+      <div className="picker" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
+        {children}
+      </div>
+    </div>,
+    document.body
+  );
+}
 
 /** Image avec repli : si le fichier n'existe pas encore, un cadre neutre s'affiche. */
 export function Media({ src, alt, ratio = "16/10", className = "" }: { src?: string; alt: string; ratio?: string; className?: string }) {
@@ -17,12 +38,13 @@ export function Media({ src, alt, ratio = "16/10", className = "" }: { src?: str
 }
 
 export function Counter({ label, value, onChange, min = 0, max = 12 }: { label: string; value: number; onChange: (v: number) => void; min?: number; max?: number }) {
+  const { t } = useI18n();
   return (
     <div className="counter" role="group" aria-label={label}>
       <span>{label}</span>
-      <button type="button" aria-label={`Moins de ${label.toLowerCase()}`} disabled={value <= min} onClick={() => onChange(value - 1)}>−</button>
+      <button type="button" aria-label={`${t.accessibility.decrease} : ${label}`} disabled={value <= min} onClick={() => onChange(value - 1)}>−</button>
       <output aria-live="polite">{value}</output>
-      <button type="button" aria-label={`Plus de ${label.toLowerCase()}`} disabled={value >= max} onClick={() => onChange(value + 1)}>+</button>
+      <button type="button" aria-label={`${t.accessibility.increase} : ${label}`} disabled={value >= max} onClick={() => onChange(value + 1)}>+</button>
     </div>
   );
 }
@@ -38,9 +60,10 @@ export function Field({ label, error, children }: { label: string; error?: strin
 }
 
 export function Progress({ step }: { step: 1 | 2 | 3 }) {
-  const steps = ["Trajet", "Véhicule", "WhatsApp"];
+  const { t } = useI18n();
+  const steps = [t.common.trip, t.step2.vehicle, "WhatsApp"];
   return (
-    <ol className="progress" aria-label={`Étape ${step} sur 3`}>
+    <ol className="progress" aria-label={t.accessibility.step.replace("{step}", String(step))}>
       {steps.map((s, i) => (
         <li key={s} className={i < step ? "is-done" : ""} aria-current={i + 1 === step ? "step" : undefined}>
           <span className="progress__bar" />
@@ -84,13 +107,32 @@ export function Testimonial({ quote, name, context }: { quote: string; name: str
   );
 }
 
-export function ArticleCard({ slug, category, title }: { slug: string; category: string; title: string }) {
+export function ArticleImage({ slug, image, ratio = "16/10", linkedCredit = false }: Pick<Article, "slug" | "image"> & { ratio?: string; linkedCredit?: boolean }) {
+  const { t } = useI18n();
+  return (
+    <figure style={{ margin: 0 }}>
+      <Media src={`/images/journal/${slug}.jpg`} alt={image?.alt ?? t.journal.imageFallback} ratio={ratio} />
+      {image && (
+        <figcaption className="caption muted" style={{ marginTop: 8 }}>
+          © {linkedCredit ? <a href={image.source} target="_blank" rel="noopener noreferrer">{image.author}</a> : image.author}
+          {" · "}
+          {linkedCredit ? <a href={image.licenseUrl} target="_blank" rel="noopener noreferrer">{image.license}</a> : image.license}
+          {" · "}{t.journal.imageChanges}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+export function ArticleCard(article: Article) {
+  const { locale, t } = useI18n();
+  const { slug, category, title, image } = localizeArticle(article, locale);
   return (
     <Link href={`/journal/${slug}/`} className="article-card">
-      <Media src={`/images/journal/${slug}.jpg`} alt="Photo de l'article" ratio="16/10" />
+      <ArticleImage slug={slug} image={image} />
       <span className="kicker">{category}</span>
       <span className="display-s">{title}</span>
-      <span className="label muted">Lire l'article</span>
+      <span className="label muted">{t.journal.readArticle}</span>
     </Link>
   );
 }

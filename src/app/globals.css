@@ -125,11 +125,49 @@ main { padding-top: var(--header-h); }
   background: transparent; border: 0; outline: none; color: var(--pearl);
   font: inherit; font-size: 16px; line-height: 26px; padding: 0; width: 100%;
 }
+/* input[type=date] est un contrôle natif : un line-height non standard décale la
+   géométrie interne de ses segments (jj/mm/aaaa) sur desktop (Chrome/WebKit) et peut
+   les rendre impossibles à cliquer/saisir. On revient au line-height par défaut du
+   navigateur pour ce type de champ uniquement. */
+.field input[type="date"] { line-height: normal; }
 .field input::placeholder, .field textarea::placeholder { color: var(--dim); }
+/* Neutralise le fond blanc imposé par l'autofill natif (Safari/Chrome) */
+.field input:-webkit-autofill,
+.field input:-webkit-autofill:hover,
+.field input:-webkit-autofill:focus,
+.field input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--pearl);
+  caret-color: var(--pearl);
+  box-shadow: 0 0 0 1000px var(--night) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
 .field textarea { resize: vertical; min-height: 96px; }
 .field-error { font-size: 12px; color: var(--error); }
 button.field { text-align: left; }
 .field .placeholder { color: var(--dim); }
+
+/* ---------- Champ d'adresse (suggestions + géolocalisation) ---------- */
+.address-field { position: relative; width: 100%; }
+.address-field__row { display: flex; align-items: center; gap: 8px; }
+.address-field__row input { flex: 1; }
+.address-field__locate {
+  flex: none; display: grid; place-items: center; width: 28px; height: 28px; padding: 0;
+  background: none; border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--pearl);
+  cursor: pointer; font-size: 14px; line-height: 1;
+}
+.address-field__locate:hover:not(:disabled) { border-color: var(--champagne); }
+.address-field__locate:disabled { opacity: .6; cursor: default; }
+.address-field__list {
+  position: absolute; z-index: 60; top: calc(100% + 6px); left: 0; right: 0; margin: 0; padding: 6px;
+  list-style: none; background: var(--graphite); border: 1px solid var(--line); border-radius: var(--radius-md);
+  box-shadow: 0 12px 24px rgba(0,0,0,.35); max-height: 260px; overflow: auto;
+}
+.address-field__list li button {
+  display: block; width: 100%; text-align: left; padding: 8px 10px; background: none; border: 0;
+  border-radius: var(--radius-sm); color: var(--pearl); font-size: 14px; cursor: pointer;
+}
+.address-field__list li button:hover { background: var(--night); }
+.address-field__attrib { padding: 6px 10px 2px; }
 
 /* ---------- Puces ---------- */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -156,6 +194,7 @@ button.field { text-align: left; }
 .media { position: relative; overflow: hidden; background: var(--line); }
 .media img { width: 100%; height: 100%; object-fit: cover; }
 .media--empty::after { content: attr(data-label); position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 13px; }
+
 .dot-list { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
 .dot-list li { display: flex; gap: 12px; align-items: baseline; }
 .dot-list li::before { content: ""; flex: 0 0 6px; height: 6px; background: var(--champagne); transform: translateY(-2px); }

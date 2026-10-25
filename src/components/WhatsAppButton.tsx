@@ -1,4 +1,7 @@
+"use client";
+
 import { whatsappLink } from "@/lib/whatsapp";
+import { useI18n } from "@/i18n/context";
 
 export function WhatsAppIcon({ size = 22 }: { size?: number }) {
   return (
@@ -11,16 +14,17 @@ export function WhatsAppIcon({ size = 22 }: { size?: number }) {
 
 /** Bouton flottant présent sur toutes les pages : texte sur ordinateur, icône seule sur mobile. */
 export default function WhatsAppFab() {
+  const { t } = useI18n();
   return (
     <a
       href={whatsappLink("Bonjour, je souhaite réserver un chauffeur.")}
       className="wa-fab"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Réserver sur WhatsApp"
+      aria-label={t.whatsappFab.ariaLabel}
     >
       <WhatsAppIcon />
-      <span className="hide-mobile">Réserver sur WhatsApp</span>
+      <span className="hide-mobile">{t.whatsappFab.label}</span>
     </a>
   );
 }

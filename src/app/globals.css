@@ -1,0 +1,185 @@
+/* ==========================================================================
+   Monaco Black Car — design tokens (identiques aux variables Figma « MBC Tokens »)
+   ========================================================================== */
+:root {
+  --night: #0d0d0d;
+  --graphite: #1a1a1a;
+  --surface: #141414;
+  --line: #2e2e2e;
+  --pearl: #f2eee8;
+  --muted: #9a968f;
+  --dim: #6b6862;
+  --champagne: #c8a96a;
+  --champagne-hover: #d9be85;
+  --sea: #1f3b4d;
+  --sea-deep: #11222c;
+  --success: #6faf8b;
+  --error: #d9776b;
+  --whatsapp: #25d366;
+  --whatsapp-ink: #08140d;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
+
+  --font: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --container: 1200px;
+  --gutter: 120px;
+  --header-h: 77px;
+}
+
+@media (max-width: 1280px) { :root { --gutter: 48px; } }
+@media (max-width: 760px)  { :root { --gutter: 20px; --header-h: 68px; } }
+
+/* Sections « alternées » : crème en version claire, anthracite en version sombre */
+[data-theme="claire"] { --alt-bg: var(--pearl); --alt-ink: var(--night); --alt-muted: #5f5b55; --alt-card: var(--graphite); }
+[data-theme="sombre"] { --alt-bg: var(--surface); --alt-ink: var(--pearl); --alt-muted: var(--muted); --alt-card: var(--graphite); }
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--pearl);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 1.5px solid var(--champagne); outline-offset: 2px; }
+main { padding-top: var(--header-h); }
+
+/* ---------- Typographie (styles Figma) ---------- */
+.display-xl { font-size: clamp(40px, 5vw, 64px); line-height: 1.1; font-weight: 300; letter-spacing: -0.01em; margin: 0; }
+.display-l  { font-size: clamp(32px, 3.6vw, 48px); line-height: 1.12; font-weight: 300; letter-spacing: -0.01em; margin: 0; }
+.display-m  { font-size: clamp(26px, 2.4vw, 32px); line-height: 1.2; font-weight: 400; margin: 0; }
+.display-s  { font-size: clamp(19px, 1.8vw, 24px); line-height: 1.25; font-weight: 500; margin: 0; }
+.price      { font-size: 28px; line-height: 1.15; font-weight: 500; color: var(--champagne); }
+.body-l { font-size: 18px; line-height: 28px; }
+.body-s { font-size: 14px; line-height: 22px; }
+.label  { font-size: 13px; line-height: 18px; font-weight: 600; }
+.caption{ font-size: 12px; line-height: 16px; }
+.kicker { font-size: 13px; font-weight: 600; color: var(--champagne); letter-spacing: 0.02em; }
+.muted  { color: var(--muted); }
+.gold   { color: var(--champagne); }
+
+/* ---------- Mise en page ---------- */
+.container { width: 100%; max-width: calc(var(--container) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
+.section { padding: 96px 0; }
+.section--alt { background: var(--alt-bg); color: var(--alt-ink); }
+.section--alt .muted { color: var(--alt-muted); }
+.section--surface { background: var(--surface); }
+.section--sea { background: var(--sea); }
+.section-head { display: grid; gap: 10px; margin-bottom: 40px; max-width: 900px; }
+.section-head--row { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; max-width: none; flex-wrap: wrap; }
+.grid { display: grid; gap: 24px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.stack { display: grid; gap: 16px; align-content: start; }
+@media (max-width: 1024px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 760px) {
+  .section { padding: 56px 0; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+
+.page-head { background: var(--sea-deep); padding: 56px 0 48px; }
+.page-head .crumb { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.page-head p { color: var(--muted); max-width: 720px; margin: 12px 0 0; }
+@media (max-width: 760px) { .page-head { padding: 32px 0 24px; } }
+
+/* ---------- Boutons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 14px 28px; border-radius: var(--radius-pill);
+  font-size: 15px; font-weight: 600; line-height: 20px; cursor: pointer;
+  border: 1px solid transparent; transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+  text-align: center;
+}
+.btn--primary { background: var(--champagne); color: var(--night); }
+.btn--primary:hover { background: var(--champagne-hover); }
+.btn--secondary { background: transparent; color: var(--pearl); border-color: var(--pearl); }
+.btn--secondary:hover { background: var(--graphite); }
+.section--alt .btn--secondary { color: var(--alt-ink); border-color: var(--alt-ink); }
+.btn--whatsapp { background: var(--whatsapp); color: var(--whatsapp-ink); }
+.btn--whatsapp:hover { filter: brightness(1.06); }
+.btn--block { width: 100%; }
+.btn--sm { min-height: 40px; padding: 9px 18px; font-size: 14px; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.link { color: var(--champagne); font-weight: 600; font-size: 14px; }
+.link:hover { text-decoration: underline; }
+
+/* ---------- Champs ---------- */
+.field { display: grid; gap: 4px; padding: 12px 16px; background: var(--night); border: 1px solid var(--line); border-radius: var(--radius-md); cursor: text; transition: border-color .15s; }
+.field:focus-within { border-color: var(--champagne); }
+.field--error { border-color: var(--error); }
+.field label, .field .field-label { font-size: 12px; line-height: 16px; color: var(--muted); }
+.field input, .field textarea, .field select, .field .field-value {
+  background: transparent; border: 0; outline: none; color: var(--pearl);
+  font: inherit; font-size: 16px; line-height: 26px; padding: 0; width: 100%;
+}
+/* input[type=date] est un contrôle natif : un line-height non standard décale la
+   géométrie interne de ses segments (jj/mm/aaaa) sur desktop (Chrome/WebKit) et peut
+   les rendre impossibles à cliquer/saisir. On revient au line-height par défaut du
+   navigateur pour ce type de champ uniquement. */
+.field input[type="date"] { line-height: normal; }
+.field input::placeholder, .field textarea::placeholder { color: var(--dim); }
+/* Neutralise le fond blanc imposé par l'autofill natif (Safari/Chrome) */
+.field input:-webkit-autofill,
+.field input:-webkit-autofill:hover,
+.field input:-webkit-autofill:focus,
+.field input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--pearl);
+  caret-color: var(--pearl);
+  box-shadow: 0 0 0 1000px var(--night) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+.field textarea { resize: vertical; min-height: 96px; }
+.field-error { font-size: 12px; color: var(--error); }
+button.field { text-align: left; }
+.field .placeholder { color: var(--dim); }
+
+/* ---------- Puces ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; padding: 9px 18px; border-radius: var(--radius-pill);
+  border: 1px solid var(--line); background: transparent; color: var(--pearl);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--champagne); border-color: var(--champagne); color: var(--night); }
+.section--alt .chip { color: var(--alt-ink); }
+
+/* ---------- Compteur ---------- */
+.counter { display: flex; align-items: center; gap: 16px; padding: 10px 12px 10px 16px; background: var(--night); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.counter span:first-child { flex: 1; }
+.counter button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: transparent; cursor: pointer; font-size: 18px; }
+.counter button:disabled { opacity: .3; cursor: not-allowed; }
+.counter output { min-width: 20px; text-align: center; font-weight: 600; }
+
+/* ---------- Cartes ---------- */
+.card { background: var(--graphite); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.card--pad { padding: 28px; }
+.section--alt .card { color: var(--pearl); }
+.media { position: relative; overflow: hidden; background: var(--line); }
+.media img { width: 100%; height: 100%; object-fit: cover; }
+.media--empty::after { content: attr(data-label); position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 13px; }
+.dot-list { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
+.dot-list li { display: flex; gap: 12px; align-items: baseline; }
+.dot-list li::before { content: ""; flex: 0 0 6px; height: 6px; background: var(--champagne); transform: translateY(-2px); }
+.rule-top { border-top: 2px solid var(--champagne); padding-top: 20px; }
+.divider { height: 1px; background: var(--line); border: 0; margin: 0; }
+.row-line { display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+
+/* ---------- Utilitaires ---------- */
+.hide-mobile { }
+.show-mobile { display: none; }
+@media (max-width: 760px) { .hide-mobile { display: none !important; } .show-mobile { display: initial; } }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

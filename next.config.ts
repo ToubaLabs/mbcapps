@@ -1,31 +1,12 @@
 import type { NextConfig } from "next";
 
-const securityHeaders = [
-  { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "X-Frame-Options", value: "DENY" },
-  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  {
-    key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=()",
-  },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
-  },
-];
-
+// Site 100 % statique : aucun serveur, aucune base de données.
+// `npm run build` génère le dossier /out à déposer sur n'importe quel hébergeur.
 const nextConfig: NextConfig = {
-  agentRules: false,
-  output: "standalone",
-  images: {
-    // Local placeholder illustrations are SVG; safe since they are bundled, not user-uploaded.
-    dangerouslyAllowSVG: true,
-    contentDispositionType: "attachment",
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-  },
-  async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
-  },
+  output: "export",
+  trailingSlash: true,
+  images: { unoptimized: true },
+  experimental: { agentUpgrade: "security" },
 };
 
 export default nextConfig;

@@ -38,6 +38,8 @@ Le déploiement local crée ou met à jour le Worker `monaco-black-car`. `npm ru
 
 Les workflows GitHub Actions appellent le workflow réutilisable de [`ToubaLabs/github-workflows`](https://github.com/ToubaLabs/github-workflows). Un push vers `main` met à jour `monaco-black-car.mbcapps.workers.dev`; la publication d'une release déploie le Worker `prod.mbcapps.workers.dev`. Configurer `CLOUDFLARE_API_TOKEN` (Worker courant), `CLOUDFLARE_API_TOKEN_PROD` (production) et `CLOUDFLARE_ACCOUNT_ID` dans **Settings → Secrets and variables → Actions** du dépôt.
 
+Le workflow `.github/workflows/cloudflare-pr-preview.yml` crée une preview Cloudflare `pr-<numéro>` et ajoute son lien aux PR provenant du dépôt. Les PR de forks sont ignorées. À la fermeture de la PR, la preview est supprimée. Ce workflow utilise uniquement `CLOUDFLARE_API_TOKEN` du Worker courant, jamais le token de production. Le build exécutant le code de la PR, les previews sont réservées aux contributeurs internes de confiance.
+
 La commande `npm run build` reste disponible pour produire l'export statique destiné aux autres hébergeurs.
 
 ## 3. Structure

@@ -1,0 +1,123 @@
+name: Cloudflare PR Preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+
+concurrency:
+  group: cloudflare-pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    if: ${{ github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    outputs:
+      preview_url: ${{ steps.deploy.outputs.preview_url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.22.0
+          cache: npm
+
+      - run: npm ci
+
+      - name: Déployer l’aperçu Cloudflare
+        id: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_WORKER_NAME: monaco-black-car
+          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+        run: |
+          set -o pipefail
+          npx vinext-cloudflare previews deploy --preview-name "$PREVIEW_NAME" 2>&1 \
+            | tee "$RUNNER_TEMP/cloudflare-preview.log"
+
+          preview_url="$(sed -nE 's/^[[:space:]]*Preview URL:[[:space:]]*(https?:\/\/[^[:space:]]+).*$/\1/p' \
+            "$RUNNER_TEMP/cloudflare-preview.log" | tail -n 1)"
+          if [ -z "$preview_url" ]; then
+            echo "::error::L’URL de la preview est absente de la sortie de déploiement."
+            exit 1
+          fi
+
+          echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
+          {
+            printf '### Preview Cloudflare : %s\n\n' "$PREVIEW_NAME"
+            printf '%s\n' "$preview_url"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  comment:
+    needs: preview
+    if: ${{ needs.preview.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@v9
+        env:
+          PREVIEW_URL: ${{ needs.preview.outputs.preview_url }}
+        with:
+          script: |
+            const previewUrl = process.env.PREVIEW_URL;
+            if (!previewUrl || !previewUrl.startsWith("https://")) {
+              throw new Error("L’URL de la preview Cloudflare est invalide ou absente.");
+            }
+
+            const marker = "<!-- cloudflare-pr-preview -->";
+            const body = `${marker}\n## Preview Cloudflare\n\n${previewUrl}\n\nLa preview est mise à jour à chaque push et supprimée à la fermeture de la PR.`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+            });
+            const existing = comments.find(
+              (comment) =>
+                comment.user?.login === "github-actions[bot]" &&
+                comment.body?.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+  cleanup:
+    if: ${{ github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.22.0
+          cache: npm
+
+      - run: npm ci
+
+      - name: Supprimer la preview Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_WORKER_NAME: monaco-black-car
+          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+        run: npx cf previews delete "$PREVIEW_NAME" --worker "$CLOUDFLARE_WORKER_NAME" --force

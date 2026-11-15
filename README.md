@@ -34,9 +34,9 @@ La configuration Cloudflare du dépôt utilise **Workers avec Vinext**. Elle ne 
 3. Vérifier la compilation Worker : `npm run build:vinext`.
 4. Déployer : `npm run deploy:vinext`.
 
-Le déploiement crée ou met à jour le Worker `monaco-black-car`. `npm run dev:vinext` lance aussi le site en local sur le port 3001. Pour une intégration continue, ne stocker aucun jeton Cloudflare dans le dépôt : utiliser les secrets de l'environnement de build.
+Le déploiement local crée ou met à jour le Worker `monaco-black-car`. `npm run dev:vinext` lance aussi le site en local sur le port 3001. Pour une intégration continue, ne stocker aucun jeton Cloudflare dans le dépôt : utiliser les secrets de l'environnement de build.
 
-Le workflow GitHub Actions de `.github/workflows/deploy-cloudflare.yml` appelle le workflow réutilisable de [`ToubaLabs/github-workflows`](https://github.com/ToubaLabs/github-workflows). Il déploie automatiquement la version correspondante quand une release GitHub est publiée. Ajouter `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID` dans **Settings → Secrets and variables → Actions** du dépôt.
+Les workflows GitHub Actions appellent le workflow réutilisable de [`ToubaLabs/github-workflows`](https://github.com/ToubaLabs/github-workflows). Un push vers `main` met à jour `monaco-black-car.mbcapps.workers.dev`; la publication d'une release déploie le Worker `prod.mbcapps.workers.dev`. Ajouter `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID` dans **Settings → Secrets and variables → Actions** du dépôt.
 
 La commande `npm run build` reste disponible pour produire l'export statique destiné aux autres hébergeurs.
 

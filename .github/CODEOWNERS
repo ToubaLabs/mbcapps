@@ -1,0 +1,9 @@
+# Deployment workflows and Cloudflare configuration require maintainer review.
+/.github/workflows/ @doulba
+/.github/CODEOWNERS @doulba
+/cloudflare.config.ts @doulba
+/vite.config.ts @doulba
+/wrangler.json @doulba
+/wrangler.jsonc @doulba
+/package.json @doulba
+/package-lock.json @doulba

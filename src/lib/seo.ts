@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { site } from "@/data/site";
 import { getDictionary } from "@/i18n/dictionaries";
 import { allLocales, isLocale, localeHref, type Locale } from "@/i18n/locales";
@@ -50,7 +51,7 @@ export function pageMetadata(
 export function staticPageMetadata(path: string) {
   return async ({ params }: { params: Promise<{ locale?: string }> }): Promise<Metadata> => {
     const locale = (await params).locale ?? "fr";
-    if (!isLocale(locale)) throw new Error(`Langue non prise en charge : ${locale}`);
+    if (!isLocale(locale)) notFound();
     const t = getDictionary(locale);
     const pages: Record<string, { title: string; description: string }> = {
       "/": t.meta,

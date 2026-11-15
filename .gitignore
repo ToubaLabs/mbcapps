@@ -3,3 +3,6 @@ node_modules
 out
 .vercel
 .env*
+/dist/
+.vinext/
+.cloudflare/

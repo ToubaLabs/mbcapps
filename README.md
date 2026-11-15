@@ -10,7 +10,7 @@ Version **1.0** du site, construite à partir des maquettes Figma « Monaco Blac
 
 ## 1. Lancer le projet
 
-Prérequis : **Node.js 20 ou plus récent**.
+Prérequis : **Node.js 22.23+, 24.22+ ou 26.12+**.
 
 ```bash
 npm install
@@ -24,6 +24,21 @@ npm start          # prévisualise le dossier /out
 `npm run build` produit un dossier **`/out`** contenant uniquement des fichiers HTML, CSS, JS et images.
 Il se dépose tel quel sur n'importe quel hébergeur : Vercel, Netlify, OVH, o2switch, un serveur Apache/Nginx…
 Les pages sont générées à l'avance : Google et les aperçus de liens (WhatsApp, réseaux) voient tout le contenu.
+
+### Déployer sur Cloudflare Workers
+
+La configuration Cloudflare du dépôt utilise **Workers avec Vinext**. Elle ne déploie pas le dossier `/out` produit par `npm run build` et ne correspond pas à Cloudflare Pages.
+
+1. Installer les dépendances avec `npm ci`.
+2. S'authentifier auprès de Cloudflare : `npx cf auth login`.
+3. Vérifier la compilation Worker : `npm run build:vinext`.
+4. Déployer : `npm run deploy:vinext`.
+
+Le déploiement crée ou met à jour le Worker `monaco-black-car`. `npm run dev:vinext` lance aussi le site en local sur le port 3001. Pour une intégration continue, ne stocker aucun jeton Cloudflare dans le dépôt : utiliser les secrets de l'environnement de build.
+
+Le workflow GitHub Actions de `.github/workflows/deploy-cloudflare.yml` appelle le workflow réutilisable de [`ToubaLabs/github-workflows`](https://github.com/ToubaLabs/github-workflows). Il déploie automatiquement sur chaque push vers `main`. Ajouter `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID` dans **Settings → Secrets and variables → Actions** du dépôt.
+
+La commande `npm run build` reste disponible pour produire l'export statique destiné aux autres hébergeurs.
 
 ## 3. Structure
 
